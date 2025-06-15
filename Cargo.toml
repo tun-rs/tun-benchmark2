@@ -1,0 +1,38 @@
+[package]
+name = "tun-benchmark2"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1.45.1", features = ["full"] }
+tun-rs = { version = "2.3.0", features = ["async"] }
+pnet_packet = "0.35.0"
+clap = { version = "4.5.40", features = ["derive"] }
+bytes = "1.10.1"
+ctrlc2 = { version = "3", features = ["tokio", "termination"] }
+
+[[bin]]
+name = "tun-rs-async-normal"
+path = "src/tun-rs-async-normal.rs"
+[[bin]]
+name = "tun-rs-async-normal-channel"
+path = "src/tun-rs-async-normal-channel.rs"
+[[bin]]
+name = "tun-rs-async-tso"
+path = "src/tun-rs-async-tso.rs"
+[[bin]]
+name = "tun-rs-async-tso-channel"
+path = "src/tun-rs-async-tso-channel.rs"
+
+[[bin]]
+name = "tun-rs-sync-normal"
+path = "src/tun-rs-sync-normal.rs"
+[[bin]]
+name = "tun-rs-sync-normal-channel"
+path = "src/tun-rs-sync-normal-channel.rs"
+[[bin]]
+name = "tun-rs-sync-tso"
+path = "src/tun-rs-sync-tso.rs"
+[[bin]]
+name = "tun-rs-sync-tso-channel"
+path = "src/tun-rs-sync-tso-channel.rs"
