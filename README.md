@@ -10,7 +10,7 @@ configurations and libraries.
 - **Benchmark Tool:** iperf3
 - **TUN Libraries:** [`tun-rs`](https://github.com/tun-rs/tun-rs)
 
-## Configurations Tested
+## Test
 
 Each test uses `iperf3` to send traffic from `10.0.1.1` (via `tun11`) to `10.0.2.1` (via `tun22`). All interfaces are
 handled using a Rust-based TUN forwarder, either in async or sync mode, with optional channel buffering and offload.
@@ -18,8 +18,6 @@ handled using a Rust-based TUN forwarder, either in async or sync mode, with opt
 ```shell
  ./scripts/bench.sh
 ```
-
----
 
 ## Benchmark Summary Table
 
