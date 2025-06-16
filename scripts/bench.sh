@@ -1,14 +1,14 @@
 #!/bin/bash
 
-#cargo build --bin=tun-rs-async-normal --release
-#cargo build --bin=tun-rs-async-normal-channel --release
-#cargo build --bin=tun-rs-async-tso --release
-#cargo build --bin=tun-rs-async-tso-channel --release
+cargo build --bin=tun-rs-async-normal --release
+cargo build --bin=tun-rs-async-normal-channel --release
+cargo build --bin=tun-rs-async-tso --release
+cargo build --bin=tun-rs-async-tso-channel --release
 
-#cargo build --bin=tun-rs-sync-normal --release
-#cargo build --bin=tun-rs-sync-normal-channel --release
-#cargo build --bin=tun-rs-sync-tso --release
-#cargo build --bin=tun-rs-sync-tso-channel --release
+cargo build --bin=tun-rs-sync-normal --release
+cargo build --bin=tun-rs-sync-normal-channel --release
+cargo build --bin=tun-rs-sync-tso --release
+cargo build --bin=tun-rs-sync-tso-channel --release
 
 TUN_IFACE0="tun11"
 TUN_IFACE1="tun22"
@@ -130,12 +130,11 @@ run_benchmark() {
     print_blue "[4] Running iperf3 client test..."
     start_monitor "$FORWARDER_PID"
     TEST_OUTPUT=$(iperf3 -c $IP1 -t $TEST_DURATION -i 0)
-    echo
-    reset  # Reset colors without clearing screen
+    #echo
+    #reset  # Reset colors without clearing screen
     print_green "[5] [$prog_name] iperf3 client test complete. Output below:"
     echo
     print_green "$TEST_OUTPUT"
-    print_green "=== Benchmark Finished ==="
     get_monitor_result
     kill $SERVER_PID
     kill $FORWARDER_PID
@@ -143,12 +142,26 @@ run_benchmark() {
 }
 
 print_green ">>> Running TUN benchmark test..."
-#run_benchmark "./target/release/tun-rs-async-normal"
-#run_benchmark "./target/release/tun-rs-async-normal-channel"
-#run_benchmark "./target/release/tun-rs-async-tso"
-#run_benchmark "./target/release/tun-rs-async-tso-channel"
 
-#run_benchmark "./target/release/tun-rs-sync-normal"
-#run_benchmark "./target/release/tun-rs-sync-normal-channel"
-#run_benchmark "./target/release/tun-rs-sync-tso"
-run_benchmark "./target/release/tun-rs-sync-tso-channel"
+ALL_BENCHMARKS="
+./target/release/tun-rs-async-normal
+./target/release/tun-rs-async-normal-channel
+./target/release/tun-rs-async-tso
+./target/release/tun-rs-async-tso-channel
+./target/release/tun-rs-sync-normal
+./target/release/tun-rs-sync-normal-channel
+./target/release/tun-rs-sync-tso
+./target/release/tun-rs-sync-tso-channel
+"
+
+if [ "$#" -eq 0 ]; then
+    for bench in $ALL_BENCHMARKS; do
+        run_benchmark "$bench"
+        sleep 1
+    done
+else
+    for bench in "$@"; do
+        run_benchmark "$bench"
+        sleep 1
+    done
+fi
