@@ -60,6 +60,7 @@ Max CPU:    150.00 %
 Avg Memory: 3.16 MB
 Max Memory: 3.16 MB
 ```
+![tun-rs-async-normal-flamegraph.svg](flamegraph/tun-rs-async-normal-flamegraph.svg)
 
 ### 2. Basic TUN with Channel Buffering (Async)
 
@@ -80,6 +81,7 @@ Max CPU:    223.00 %
 Avg Memory: 14.89 MB
 Max Memory: 17.84 MB
 ```
+![tun-rs-async-normal-channel-flamegraph.svg](flamegraph/tun-rs-async-normal-channel-flamegraph.svg)
 
 ### 3. TUN with Offload Enabled (Async)
 
@@ -100,6 +102,7 @@ Max CPU:    88.90 %
 Avg Memory: 20.86 MB
 Max Memory: 20.86 MB
 ```
+![tun-rs-async-gso-flamegraph.svg](flamegraph/tun-rs-async-gso-flamegraph.svg)
 
 ### 4. TUN with Offload + Channel Buffering (Async)
 
@@ -120,6 +123,7 @@ Max CPU:    162.00 %
 Avg Memory: 292.91 MB
 Max Memory: 351.31 MB
 ```
+![tun-rs-async-gso-channel-flamegraph.svg](flamegraph/tun-rs-async-gso-channel-flamegraph.svg)
 
 ### 5. Basic TUN Read/Write (Sync)
 
@@ -140,6 +144,7 @@ Max CPU:    131.00 %
 Avg Memory: 1.00 MB
 Max Memory: 1.00 MB
 ```
+![tun-rs-sync-normal-flamegraph.svg](flamegraph/tun-rs-sync-normal-flamegraph.svg)
 
 ### 6. Basic TUN with Channel Buffering (Sync)
 
@@ -160,6 +165,7 @@ Max CPU:    241.00 %
 Avg Memory: 4.81 MB
 Max Memory: 5.74 MB
 ```
+![tun-rs-sync-normal-channel-flamegraph.svg](flamegraph/tun-rs-sync-normal-channel-flamegraph.svg)
 
 ### 7. TUN with Offload Enabled (Sync)
 
@@ -180,6 +186,7 @@ Max CPU:    105.00 %
 Avg Memory: 21.05 MB
 Max Memory: 21.05 MB
 ```
+![tun-rs-sync-gso-flamegraph.svg](flamegraph/tun-rs-sync-gso-flamegraph.svg)
 
 ### 8. TUN with Offload + Channel Buffering (Sync)
 
@@ -200,3 +207,4 @@ Max CPU:    188.00 %
 Avg Memory: 121.68 MB
 Max Memory: 136.09 MB
 ```
+![tun-rs-sync-gso-channel-flamegraph.svg](flamegraph/tun-rs-sync-gso-channel-flamegraph.svg)
