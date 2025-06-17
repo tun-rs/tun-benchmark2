@@ -2,7 +2,6 @@ use bytes::BytesMut;
 use clap::Parser;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
-use tokio::sync::mpsc::{Receiver, Sender};
 use tun_rs::{AsyncDevice, DeviceBuilder, GROTable, IDEAL_BATCH_SIZE, VIRTIO_NET_HDR_LEN};
 
 #[derive(Parser, Debug)]
@@ -21,15 +20,48 @@ struct Args {
     /// IP address for second interface (e.g., 10.0.2.1)
     #[arg(long)]
     ip2: Ipv4Addr,
+    /// Worker thread num
+    #[arg(long)]
+    thread: Option<usize>,
+}
+fn main() {
+    let args = Args::parse();
+    println!("args={:?}", args);
+    if let Some(thread) = args.thread {
+        if thread == 1 {
+            tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap()
+                .block_on(async {
+                    run().await;
+                })
+        } else {
+            tokio::runtime::Builder::new_multi_thread()
+                .worker_threads(thread)
+                .enable_all()
+                .build()
+                .unwrap()
+                .block_on(async {
+                    run().await;
+                })
+        }
+    } else {
+        main0();
+    }
 }
 
 #[tokio::main]
-async fn main() {
+async fn main0() {
+    run().await;
+}
+async fn run() {
     let Args {
         iface1,
         ip1,
         iface2,
         ip2,
+        ..
     } = Args::parse();
 
     let device1 = DeviceBuilder::new()
@@ -58,21 +90,20 @@ async fn main() {
         device1.tcp_gso(),
         device1.udp_gso()
     );
-    let (s1, r1) = tokio::sync::mpsc::channel(2048);
-    let (s2, r2) = tokio::sync::mpsc::channel(2048);
-    let handle1 = tokio::spawn(dev_to_channel(device1.clone(), s1));
-    let handle2 = tokio::spawn(dev_to_channel(device2.clone(), s2));
-
-    let handle3 = tokio::spawn(channel_to_dev(r1, device2));
-    let handle4 = tokio::spawn(channel_to_dev(r2, device1));
-    tokio::try_join!(handle1, handle2, handle3, handle4).unwrap();
+    let handle1 = tokio::spawn(copy(device1.clone(), device2.clone()));
+    let handle2 = tokio::spawn(copy(device2, device1));
+    tokio::try_join!(handle1, handle2).unwrap();
 }
-async fn dev_to_channel(dev: Arc<AsyncDevice>, sender: Sender<BytesMut>) {
+async fn copy(device1: Arc<AsyncDevice>, device2: Arc<AsyncDevice>) {
     let mut original_buffer = vec![0; VIRTIO_NET_HDR_LEN + 65535];
-    let mut bufs = vec![BytesMut::zeroed(VIRTIO_NET_HDR_LEN + 1500); IDEAL_BATCH_SIZE];
+    let mut bufs = vec![BytesMut::zeroed(VIRTIO_NET_HDR_LEN + 65535); IDEAL_BATCH_SIZE];
     let mut sizes = vec![0; IDEAL_BATCH_SIZE];
+    let mut gro_table = GROTable::default();
     loop {
-        let num = dev
+        for x in &mut bufs {
+            x.resize(VIRTIO_NET_HDR_LEN + 1500, 0u8);
+        }
+        let num = device1
             .recv_multiple(
                 &mut original_buffer,
                 &mut bufs,
@@ -85,29 +116,10 @@ async fn dev_to_channel(dev: Arc<AsyncDevice>, sender: Sender<BytesMut>) {
             panic!("eof")
         }
         for i in 0..num {
-            // Reserve sufficient space in the buffer to avoid reallocations during send_multiple execution.
-            // This is critical for performance, especially under high throughput scenarios.
-            let mut buf = BytesMut::with_capacity(65536);
-            buf.extend_from_slice(&bufs[i][..VIRTIO_NET_HDR_LEN + sizes[i]]);
-            sender.send(buf).await.unwrap();
+            bufs[i].truncate(VIRTIO_NET_HDR_LEN + sizes[i]);
         }
-    }
-}
-async fn channel_to_dev(mut receiver: Receiver<BytesMut>, dev: Arc<AsyncDevice>) {
-    let mut send_bufs = Vec::with_capacity(IDEAL_BATCH_SIZE);
-    let mut gro_table = GROTable::default();
-
-    loop {
-        send_bufs.clear();
-        let bytes_mut = receiver.recv().await.unwrap();
-        send_bufs.push(bytes_mut);
-        while let Ok(buf) = receiver.try_recv() {
-            send_bufs.push(buf);
-            if send_bufs.len() >= IDEAL_BATCH_SIZE {
-                break;
-            }
-        }
-        dev.send_multiple(&mut gro_table, &mut send_bufs, VIRTIO_NET_HDR_LEN)
+        device2
+            .send_multiple(&mut gro_table, &mut bufs[..num], VIRTIO_NET_HDR_LEN)
             .await
             .unwrap();
     }

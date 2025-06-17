@@ -18,11 +18,11 @@ path = "src/tun-rs-async-normal.rs"
 name = "tun-rs-async-normal-channel"
 path = "src/tun-rs-async-normal-channel.rs"
 [[bin]]
-name = "tun-rs-async-tso"
-path = "src/tun-rs-async-tso.rs"
+name = "tun-rs-async-gso"
+path = "src/tun-rs-async-gso.rs"
 [[bin]]
-name = "tun-rs-async-tso-channel"
-path = "src/tun-rs-async-tso-channel.rs"
+name = "tun-rs-async-gso-channel"
+path = "src/tun-rs-async-gso-channel.rs"
 
 [[bin]]
 name = "tun-rs-sync-normal"
@@ -31,8 +31,8 @@ path = "src/tun-rs-sync-normal.rs"
 name = "tun-rs-sync-normal-channel"
 path = "src/tun-rs-sync-normal-channel.rs"
 [[bin]]
-name = "tun-rs-sync-tso"
-path = "src/tun-rs-sync-tso.rs"
+name = "tun-rs-sync-gso"
+path = "src/tun-rs-sync-gso.rs"
 [[bin]]
-name = "tun-rs-sync-tso-channel"
-path = "src/tun-rs-sync-tso-channel.rs"
+name = "tun-rs-sync-gso-channel"
+path = "src/tun-rs-sync-gso-channel.rs"

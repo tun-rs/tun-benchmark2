@@ -19,15 +19,48 @@ struct Args {
     /// IP address for second interface (e.g., 10.0.2.1)
     #[arg(long)]
     ip2: Ipv4Addr,
+    /// Worker thread num
+    #[arg(long)]
+    thread: Option<usize>,
+}
+fn main() {
+    let args = Args::parse();
+    println!("args={:?}", args);
+    if let Some(thread) = args.thread {
+        if thread == 1 {
+            tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap()
+                .block_on(async {
+                    run().await;
+                })
+        } else {
+            tokio::runtime::Builder::new_multi_thread()
+                .worker_threads(thread)
+                .enable_all()
+                .build()
+                .unwrap()
+                .block_on(async {
+                    run().await;
+                })
+        }
+    } else {
+        main0();
+    }
 }
 
 #[tokio::main]
-async fn main() {
+async fn main0() {
+    run().await;
+}
+async fn run() {
     let Args {
         iface1,
         ip1,
         iface2,
         ip2,
+        ..
     } = Args::parse();
 
     let device1 = DeviceBuilder::new()

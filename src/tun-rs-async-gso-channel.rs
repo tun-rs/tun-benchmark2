@@ -3,7 +3,7 @@ use clap::Parser;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 use tokio::sync::mpsc::{Receiver, Sender};
-use tun_rs::{AsyncDevice, DeviceBuilder};
+use tun_rs::{AsyncDevice, DeviceBuilder, GROTable, IDEAL_BATCH_SIZE, VIRTIO_NET_HDR_LEN};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
@@ -69,12 +69,14 @@ async fn run() {
         .name(iface1)
         .ipv4(ip1, 24, None)
         .mtu(1500)
+        .offload(true)
         .build_async()
         .unwrap();
     let device2 = DeviceBuilder::new()
         .name(iface2)
         .ipv4(ip2, 24, None)
         .mtu(1500)
+        .offload(true)
         .build_async()
         .unwrap();
     let device1 = Arc::new(device1);
@@ -83,6 +85,11 @@ async fn run() {
         "{:?},{:?}",
         device1.name().unwrap(),
         device2.name().unwrap()
+    );
+    println!(
+        "TCP-GSO:{},UDP-GSO:{}",
+        device1.tcp_gso(),
+        device1.udp_gso()
     );
     let (s1, r1) = tokio::sync::mpsc::channel(2048);
     let (s2, r2) = tokio::sync::mpsc::channel(2048);
@@ -94,15 +101,47 @@ async fn run() {
     tokio::try_join!(handle1, handle2, handle3, handle4).unwrap();
 }
 async fn dev_to_channel(dev: Arc<AsyncDevice>, sender: Sender<BytesMut>) {
-    let mut buf = [0; 65536];
+    let mut original_buffer = vec![0; VIRTIO_NET_HDR_LEN + 65535];
+    let mut bufs = vec![BytesMut::zeroed(VIRTIO_NET_HDR_LEN + 1500); IDEAL_BATCH_SIZE];
+    let mut sizes = vec![0; IDEAL_BATCH_SIZE];
     loop {
-        let len = dev.recv(&mut buf).await.unwrap();
-        sender.send(BytesMut::from(&buf[..len])).await.unwrap();
+        let num = dev
+            .recv_multiple(
+                &mut original_buffer,
+                &mut bufs,
+                &mut sizes,
+                VIRTIO_NET_HDR_LEN,
+            )
+            .await
+            .unwrap();
+        if num == 0 {
+            panic!("eof")
+        }
+        for i in 0..num {
+            // Reserve sufficient space in the buffer to avoid reallocations during send_multiple execution.
+            // This is critical for performance, especially under high throughput scenarios.
+            let mut buf = BytesMut::with_capacity(65536);
+            buf.extend_from_slice(&bufs[i][..VIRTIO_NET_HDR_LEN + sizes[i]]);
+            sender.send(buf).await.unwrap();
+        }
     }
 }
 async fn channel_to_dev(mut receiver: Receiver<BytesMut>, dev: Arc<AsyncDevice>) {
+    let mut send_bufs = Vec::with_capacity(IDEAL_BATCH_SIZE);
+    let mut gro_table = GROTable::default();
+
     loop {
+        send_bufs.clear();
         let bytes_mut = receiver.recv().await.unwrap();
-        dev.send(&bytes_mut).await.unwrap();
+        send_bufs.push(bytes_mut);
+        while let Ok(buf) = receiver.try_recv() {
+            send_bufs.push(buf);
+            if send_bufs.len() >= IDEAL_BATCH_SIZE {
+                break;
+            }
+        }
+        dev.send_multiple(&mut gro_table, &mut send_bufs, VIRTIO_NET_HDR_LEN)
+            .await
+            .unwrap();
     }
 }

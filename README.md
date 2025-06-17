@@ -16,7 +16,10 @@ Each test uses `iperf3` to send traffic from `10.0.1.1` (via `tun11`) to `10.0.2
 handled using a Rust-based TUN forwarder, either in async or sync mode, with optional channel buffering and offload.
 
 ```shell
+ # Test all test cases
  ./scripts/bench.sh
+ # Run the specified test case with parameters
+ ./scripts/bench.sh "./target/release/tun-rs-async-gso-channel --thread 2"
 ```
 
 ## Benchmark Summary Table

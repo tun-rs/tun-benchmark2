@@ -2,13 +2,13 @@
 
 cargo build --bin=tun-rs-async-normal --release
 cargo build --bin=tun-rs-async-normal-channel --release
-cargo build --bin=tun-rs-async-tso --release
-cargo build --bin=tun-rs-async-tso-channel --release
+cargo build --bin=tun-rs-async-gso --release
+cargo build --bin=tun-rs-async-gso-channel --release
 
 cargo build --bin=tun-rs-sync-normal --release
 cargo build --bin=tun-rs-sync-normal-channel --release
-cargo build --bin=tun-rs-sync-tso --release
-cargo build --bin=tun-rs-sync-tso-channel --release
+cargo build --bin=tun-rs-sync-gso --release
+cargo build --bin=tun-rs-sync-gso-channel --release
 
 TUN_IFACE0="tun11"
 TUN_IFACE1="tun22"
@@ -146,12 +146,12 @@ print_green ">>> Running TUN benchmark test..."
 ALL_BENCHMARKS="
 ./target/release/tun-rs-async-normal
 ./target/release/tun-rs-async-normal-channel
-./target/release/tun-rs-async-tso
-./target/release/tun-rs-async-tso-channel
+./target/release/tun-rs-async-gso
+./target/release/tun-rs-async-gso-channel
 ./target/release/tun-rs-sync-normal
 ./target/release/tun-rs-sync-normal-channel
-./target/release/tun-rs-sync-tso
-./target/release/tun-rs-sync-tso-channel
+./target/release/tun-rs-sync-gso
+./target/release/tun-rs-sync-gso-channel
 "
 
 if [ "$#" -eq 0 ]; then
