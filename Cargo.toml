@@ -36,3 +36,7 @@ path = "src/tun-rs-sync-gso.rs"
 [[bin]]
 name = "tun-rs-sync-gso-channel"
 path = "src/tun-rs-sync-gso-channel.rs"
+
+[[bin]]
+name = "tun-rs-sync-gso-concurrent"
+path = "src/tun-rs-sync-gso-concurrent.rs"

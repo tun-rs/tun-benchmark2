@@ -8,6 +8,7 @@ cargo build --bin=tun-rs-async-gso-channel --release
 cargo build --bin=tun-rs-sync-normal --release
 cargo build --bin=tun-rs-sync-normal-channel --release
 cargo build --bin=tun-rs-sync-gso --release
+cargo build --bin=tun-rs-sync-gso-concurrent --release
 cargo build --bin=tun-rs-sync-gso-channel --release
 
 TUN_IFACE0="tun11"
@@ -152,6 +153,7 @@ ALL_BENCHMARKS="
 ./target/release/tun-rs-sync-normal-channel
 ./target/release/tun-rs-sync-gso
 ./target/release/tun-rs-sync-gso-channel
+./target/release/tun-rs-sync-gso-concurrent
 "
 
 if [ "$#" -eq 0 ]; then
