@@ -8,6 +8,7 @@ configurations and libraries.
 - **OS:** WSL(Ubuntu 20.04.6 LTS)
 - **CPU:** i7-13700F
 - **Benchmark Tool:** iperf3
+- **Baseline Performance (Loopback via TUN IP):** ~162 Gbps
 - **TUN Libraries:** [`tun-rs`](https://github.com/tun-rs/tun-rs)
 
 ## Test
