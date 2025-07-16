@@ -5,7 +5,8 @@ edition = "2024"
 
 [dependencies]
 tokio = { version = "1.45.1", features = ["full"] }
-tun-rs = { version = "2.3.0", features = ["async"] }
+tun-rs = { git = "https://github.com/tun-rs/tun-rs",branch = "gso-framed", features = ["async","async_framed"] }
+futures = "0.3"
 pnet_packet = "0.35.0"
 clap = { version = "4.5.40", features = ["derive"] }
 bytes = "1.10.1"
@@ -23,6 +24,9 @@ path = "src/tun-rs-async-gso.rs"
 [[bin]]
 name = "tun-rs-async-gso-channel"
 path = "src/tun-rs-async-gso-channel.rs"
+[[bin]]
+name = "tun-rs-async-gso-framed"
+path = "src/tun-rs-async-gso-framed.rs"
 
 [[bin]]
 name = "tun-rs-sync-normal"
