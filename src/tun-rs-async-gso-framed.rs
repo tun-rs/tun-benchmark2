@@ -4,7 +4,7 @@ use futures::{SinkExt, StreamExt};
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 use tokio::sync::mpsc::{Receiver, Sender};
-use tun_rs::async_framed::{BytesCodec, DeviceFramed};
+use tun_rs::async_framed::{BytesCodec, DeviceFramedRead, DeviceFramedWrite};
 use tun_rs::{AsyncDevice, DeviceBuilder, IDEAL_BATCH_SIZE};
 
 #[derive(Parser, Debug)]
@@ -95,19 +95,20 @@ async fn run() {
     );
     let (s1, r1) = tokio::sync::mpsc::channel(2048);
     let (s2, r2) = tokio::sync::mpsc::channel(2048);
-    let framed1_1 = DeviceFramed::new(device1.clone(), BytesCodec::new());
-    let framed1_2 = DeviceFramed::new(device1, BytesCodec::new());
-    let framed2_1 = DeviceFramed::new(device2.clone(), BytesCodec::new());
-    let framed2_2 = DeviceFramed::new(device2, BytesCodec::new());
-    let handle1 = tokio::spawn(dev_to_channel(framed1_1, s1));
-    let handle2 = tokio::spawn(dev_to_channel(framed2_1, s2));
+    let framed_read1 = DeviceFramedRead::new(device1.clone(), BytesCodec::new());
+    let framed_write1 = DeviceFramedWrite::new(device1, BytesCodec::new());
 
-    let handle3 = tokio::spawn(channel_to_dev(r1, framed2_2));
-    let handle4 = tokio::spawn(channel_to_dev(r2, framed1_2));
+    let framed_read2 = DeviceFramedRead::new(device2.clone(), BytesCodec::new());
+    let framed_write2 = DeviceFramedWrite::new(device2, BytesCodec::new());
+    let handle1 = tokio::spawn(dev_to_channel(framed_read1, s1));
+    let handle2 = tokio::spawn(dev_to_channel(framed_read2, s2));
+
+    let handle3 = tokio::spawn(channel_to_dev(r1, framed_write2));
+    let handle4 = tokio::spawn(channel_to_dev(r2, framed_write1));
     tokio::try_join!(handle1, handle2, handle3, handle4).unwrap();
 }
 async fn dev_to_channel(
-    mut dev: DeviceFramed<BytesCodec, Arc<AsyncDevice>>,
+    mut dev: DeviceFramedRead<BytesCodec, Arc<AsyncDevice>>,
     sender: Sender<BytesMut>,
 ) {
     loop {
@@ -117,7 +118,7 @@ async fn dev_to_channel(
 }
 async fn channel_to_dev(
     mut receiver: Receiver<BytesMut>,
-    mut dev: DeviceFramed<BytesCodec, Arc<AsyncDevice>>,
+    mut dev: DeviceFramedWrite<BytesCodec, Arc<AsyncDevice>>,
 ) {
     loop {
         let mut count = 1;
@@ -126,11 +127,12 @@ async fn channel_to_dev(
         while let Ok(buf) = receiver.try_recv() {
             dev.feed(buf).await.unwrap();
             count += 1;
+            // Avoid long-loop hogging by capping the batch size
             if count >= IDEAL_BATCH_SIZE {
                 break;
             }
         }
-        <DeviceFramed<BytesCodec, Arc<AsyncDevice>> as SinkExt<BytesMut>>::flush(&mut dev)
+        <DeviceFramedWrite<BytesCodec, Arc<AsyncDevice>> as SinkExt<BytesMut>>::flush(&mut dev)
             .await
             .unwrap();
     }
