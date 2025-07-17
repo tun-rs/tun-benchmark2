@@ -153,6 +153,7 @@ Max CPU:    176.00 %
 Avg Memory: 28.11 MB
 Max Memory: 32.59 MB
 ```
+![tun-rs-async-gso-framed-flamegraph.svg](flamegraph/tun-rs-async-gso-framed-flamegraph.svg)
 
 ### 6. Basic TUN Read/Write (Sync)
 
