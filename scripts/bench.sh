@@ -4,6 +4,7 @@ cargo build --bin=tun-rs-async-normal --release
 cargo build --bin=tun-rs-async-normal-channel --release
 cargo build --bin=tun-rs-async-gso --release
 cargo build --bin=tun-rs-async-gso-channel --release
+cargo build --bin=tun-rs-async-gso-framed --release
 
 cargo build --bin=tun-rs-sync-normal --release
 cargo build --bin=tun-rs-sync-normal-channel --release
