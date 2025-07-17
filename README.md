@@ -25,21 +25,20 @@ handled using a Rust-based TUN forwarder, either in async or sync mode, with opt
 
 ## Benchmark Summary Table
 
-| #   | Mode  | Offload | Channel | Gbps | Retr  | CPU Avg | CPU Max | Mem Avg | Mem Max |
-|-----|-------|---------|---------|------|-------|---------|---------|---------|---------|
-| 1   | Async | ❌       | ❌       | 10.6 | 10480 | 99.87   | 150.00  | 3.16    | 3.16    |
-| 2   | Async | ❌       | ✅       | 13.3 | 4781  | 148.46  | 223.00  | 14.89   | 17.84   |
-| 3   | Async | ✅       | ❌       | 18.4 | 0     | 60.21   | 88.90   | 20.86   | 20.86   |
-| 4   | Async | ✅       | ✅       | 15.8 | 0     | 107.48  | 162.00  | 292.91  | 351.31  |
-| 5   | Sync  | ✅       | Framed  | 22.0 | 0     | 117.00  | 176.00  | 28.11   | 32.59   |
-| 6   | Sync  | ❌       | ❌       | 13.8 | 15493 | 87.10   | 131.00  | 1.00    | 1.00    |
-| 7   | Sync  | ❌       | ✅       | 17.2 | 6439  | 160.52  | 241.00  | 4.81    | 5.74    |
-| 8   | Sync  | ✅       | ❌       | 20.0 | 0     | 70.21   | 105.00  | 21.05   | 21.05   |
-| 9   | Sync  | ✅       | ✅       | 21.8 | 0     | 124.83  | 188.00  | 121.68  | 136.09  |
-| 10* | Sync  | ✅       | ❌       | 51.7 | 2609  | 152.49  | 229.00  | 36.97   | 36.97   |
+| #   | Mode        | Offload | Channel | Gbps | Retr  | CPU Avg | CPU Max | Mem Avg | Mem Max |
+|-----|-------------|---------|---------|------|-------|---------|---------|---------|---------|
+| 1   | Async       | ❌       | ❌       | 10.6 | 10480 | 99.87   | 150.00  | 3.16    | 3.16    |
+| 2   | Async       | ❌       | ✅       | 13.3 | 4781  | 148.46  | 223.00  | 14.89   | 17.84   |
+| 3   | Async       | ✅       | ❌       | 18.4 | 0     | 60.21   | 88.90   | 20.86   | 20.86   |
+| 4   | Async       | ✅       | ✅       | 15.8 | 0     | 107.48  | 162.00  | 292.91  | 351.31  |
+| 5   | AsyncFramed | ✅       | ✅       | 22.0 | 0     | 117.00  | 176.00  | 28.11   | 32.59   |
+| 6   | Sync        | ❌       | ❌       | 13.8 | 15493 | 87.10   | 131.00  | 1.00    | 1.00    |
+| 7   | Sync        | ❌       | ✅       | 17.2 | 6439  | 160.52  | 241.00  | 4.81    | 5.74    |
+| 8   | Sync        | ✅       | ❌       | 20.0 | 0     | 70.21   | 105.00  | 21.05   | 21.05   |
+| 9   | Sync        | ✅       | ✅       | 21.8 | 0     | 124.83  | 188.00  | 121.68  | 136.09  |
+| 10* | Sync        | ✅       | ❌       | 51.7 | 2609  | 152.49  | 229.00  | 36.97   | 36.97   |
 
 \* Test 10 uses dual-threaded concurrent I/O with GSO enabled (no channel), yielding peak throughput.
-
 
 - **Channel**: Channel buffering
 - **Gbps**: Bitrate
@@ -135,7 +134,7 @@ Max Memory: 351.31 MB
 
 ![tun-rs-async-gso-channel-flamegraph.svg](flamegraph/tun-rs-async-gso-channel-flamegraph.svg)
 
-### 5. TUN with Offload + Framed (Async)
+### 5. TUN with Offload + DeviceFramed (Async)
 
 ```text
 Connecting to host 10.0.2.1, port 5201
@@ -154,6 +153,7 @@ Max CPU:    176.00 %
 Avg Memory: 28.11 MB
 Max Memory: 32.59 MB
 ```
+
 ### 6. Basic TUN Read/Write (Sync)
 
 ```text
@@ -261,4 +261,5 @@ Max CPU:    229.00 %
 Avg Memory: 36.97 MB
 Max Memory: 36.97 MB
 ```
+
 ![tun-rs-sync-gso-concurrent-flamegraph.svg](flamegraph/tun-rs-sync-gso-concurrent-flamegraph.svg)
