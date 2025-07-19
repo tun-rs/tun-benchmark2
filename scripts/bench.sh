@@ -2,6 +2,7 @@
 
 cargo build --bin=tun-rs-async-normal --release
 cargo build --bin=tun-rs-async-normal-channel --release
+cargo build --bin=tun-rs-async-framed --release
 cargo build --bin=tun-rs-async-gso --release
 cargo build --bin=tun-rs-async-gso-channel --release
 cargo build --bin=tun-rs-async-gso-framed --release
@@ -131,7 +132,7 @@ run_benchmark() {
 
     print_blue "[4] Running iperf3 client test..."
     start_monitor "$FORWARDER_PID"
-    #sudo perf record -F 99 -p $FORWARDER_PID -g -- sleep 10 &
+    sudo perf record -F 99 -p $FORWARDER_PID -g -- sleep 10 &
     TEST_OUTPUT=$(iperf3 -c $IP1 -t $TEST_DURATION -i 0)
     #echo
     #reset  # Reset colors without clearing screen
@@ -142,11 +143,11 @@ run_benchmark() {
     kill $SERVER_PID
     kill $FORWARDER_PID
     cleanup_ns1
-    #sleep 1
-    #sudo perf script > out.perf
-    #../Flamegraph/stackcollapse-perf.pl out.perf > out.folded
-    #name=$(basename "$prog_name")
-    #../Flamegraph/flamegraph.pl out.folded > $name-flamegraph.svg
+    sleep 1
+    sudo perf script > out.perf
+    stackcollapse-perf.pl out.perf > out.folded
+    name=$(basename "$prog_name")
+    flamegraph.pl out.folded > $name-flamegraph.svg
 }
 
 print_green ">>> Running TUN benchmark test..."
@@ -156,6 +157,7 @@ ALL_BENCHMARKS="
 ./target/release/tun-rs-async-normal-channel
 ./target/release/tun-rs-async-gso
 ./target/release/tun-rs-async-gso-channel
+./target/release/tun-rs-async-gso-framed
 ./target/release/tun-rs-sync-normal
 ./target/release/tun-rs-sync-normal-channel
 ./target/release/tun-rs-sync-gso
