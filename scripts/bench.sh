@@ -146,7 +146,8 @@ run_benchmark() {
     sleep 1
     sudo perf script > out.perf
     stackcollapse-perf.pl out.perf > out.folded
-    name=$(basename "$prog_name")
+    prog_path=${prog_name%% *}
+    name=$(basename "$prog_path")
     flamegraph.pl out.folded > $name-flamegraph.svg
 }
 

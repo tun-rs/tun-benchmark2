@@ -10,7 +10,7 @@ configurations and libraries.
 - **Memory:** DDR5 32GB（2×16GB, 4800 MT/s）
 - **Benchmark Tool:** iperf3
 - **Baseline Performance (Loopback via TUN IP):** ~110 Gbps
-- **TUN Libraries:** [`tun-rs`](https://github.com/tun-rs/tun-rs)
+- **TUN Libraries:** [`tun-rs 2.5.1`](https://github.com/tun-rs/tun-rs)
 
 ## Test
 
@@ -26,20 +26,21 @@ handled using a Rust-based TUN forwarder, either in async or sync mode, with opt
 
 ## Benchmark Summary Table
 
-| #   | Mode        | Offload | Channel | Gbps | Retr  | CPU Avg | CPU Max | Mem Avg | Mem Max |
-|-----|-------------|---------|---------|------|-------|---------|---------|---------|---------|
-| 1   | Async       | ❌       | ❌       | 8.84 | 326   | 87.61   | 131.00  | 3.71    | 3.71    |
-| 2   | Async       | ❌       | ✅       | 12.1 | 3513  | 126.87  | 190.00  | 10.04   | 11.44   |
-| 3   | AsyncFramed | ❌       | ✅       | 12.0 | 3967  | 126.89  | 190.00  | 11.47   | 14.60   |
-| 4   | Async       | ✅       | ❌       | 35.7 | 0     | 65.79   | 98.50   | 20.62   | 20.62   |
-| 5   | Async       | ✅       | ✅       | 20.7 | 0     | 87.65   | 131.00  | 293.40  | 329.55  |
-| 6   | AsyncFramed | ✅       | ✅       | 23.7 | 0     | 88.46   | 132.00  | 26.27   | 28.92   |
-| 7   | Sync        | ❌       | ❌       | 10.0 | 804   | 79.74   | 119.00  | 2.21    | 2.21    |
-| 8   | Sync        | ❌       | ✅       | 13.0 | 5585  | 136.90  | 205.00  | 3.97    | 4.23    |
-| 9   | Sync        | ✅       | ❌       | 36.4 | 0     | 58.02   | 86.80   | 20.43   | 20.43   |
-| 10  | Sync        | ✅       | ✅       | 33.7 | 0     | 95.27   | 143.00  | 111.30  | 140.10  |
-| 11* | Sync        | ✅       | ❌       | 70.6 | 2748  | 121.64  | 181.00  | 38.33   | 38.33   |
-
+| #   | Mode                                                | Offload | Channel | Gbps | Retr | CPU Avg | CPU Max | Mem Avg | Mem Max |
+|-----|-----------------------------------------------------|---------|---------|------|------|---------|---------|---------|---------|
+| 1   | Async                                               | ❌       | ❌       | 8.84 | 326  | 87.61   | 131.00  | 3.71    | 3.71    |
+| 2   | Async                                               | ❌       | ✅       | 12.1 | 3513 | 126.87  | 190.00  | 10.04   | 11.44   |
+| 3   | AsyncFramed                                         | ❌       | ✅       | 12.0 | 3967 | 126.89  | 190.00  | 11.47   | 14.60   |
+| 4   | Async                                               | ✅       | ❌       | 35.7 | 0    | 64.89   | 97.70   | 7.44    | 7.44    |
+| 5   | Async                                               | ✅       | ✅       | 20.7 | 0    | 87.65   | 131.00  | 293.40  | 329.55  |
+| 6   | AsyncFramed                                         | ✅       | ✅       | 23.7 | 0    | 88.46   | 132.00  | 26.27   | 28.92   |
+| 7   | Sync                                                | ❌       | ❌       | 10.0 | 804  | 79.74   | 119.00  | 2.21    | 2.21    |
+| 8   | Sync                                                | ❌       | ✅       | 13.0 | 5585 | 136.90  | 205.00  | 3.97    | 4.23    |
+| 9   | Sync                                                | ✅       | ❌       | 36.4 | 0    | 57.90   | 86.90   | 6.80    | 6.80    |
+| 10  | Sync                                                | ✅       | ✅       | 33.7 | 0    | 95.27   | 143.00  | 111.30  | 140.10  |
+| 11* | Sync (Concurrent)                                   | ✅       | ❌       | 70.6 | 2748 | 124.49  | 185.00  | 10.65   | 10.65   |
+| 12  | [Go Basic](https://github.com/tun-rs/go_tun_test)   | ❌       | ❌       | 8.29 | 541  | 84.95   | 127.00  | 2.46    | 2.46    |
+| 13  | [Go Offload](https://github.com/tun-rs/go_tun_test) | ✅       | ❌       | 28.8 | 0    | 64.14   | 96.20   | 4.15    | 4.15    |
 
 \* Test 11 uses dual-threaded concurrent I/O with GSO enabled (no channel), yielding peak throughput.
 
@@ -48,6 +49,8 @@ handled using a Rust-based TUN forwarder, either in async or sync mode, with opt
 - **Retr**: Retransmissions
 - **CPU Avg/Max**: usage in %
 - **Mem Avg/Max**: usage in MB
+
+![throughput.svg](flamegraph/throughput.svg)
 
 ### 1. Basic TUN Read/Write (Async)
 
@@ -94,6 +97,7 @@ Max Memory: 11.44 MB
 ![tun-rs-async-normal-channel-flamegraph.svg](flamegraph/tun-rs-async-normal-channel-flamegraph.svg)
 
 ### 3. DeviceFramed (Async)
+
 ```text
 Connecting to host 10.0.2.1, port 5201
 [  5] local 10.0.1.1 port 33882 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                                                                                                                            
@@ -128,10 +132,10 @@ Connecting to host 10.0.2.1, port 5201
                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
 iperf Done.                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 === Monitor Summary ===
-Avg CPU:    65.79 %
-Max CPU:    98.50 %
-Avg Memory: 20.62 MB
-Max Memory: 20.62 MB
+Avg CPU:    64.89 %
+Max CPU:    97.70 %
+Avg Memory: 7.44 MB
+Max Memory: 7.44 MB
 ```
 
 ![tun-rs-async-gso-flamegraph.svg](flamegraph/tun-rs-async-gso-flamegraph.svg)
@@ -177,6 +181,7 @@ Max CPU:    132.00 %
 Avg Memory: 26.27 MB
 Max Memory: 28.92 MB
 ```
+
 ![tun-rs-async-gso-framed-flamegraph.svg](flamegraph/tun-rs-async-gso-framed-flamegraph.svg)
 
 ### 7. Basic TUN Read/Write (Sync)
@@ -237,10 +242,10 @@ Connecting to host 10.0.2.1, port 5201
                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
 iperf Done.                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 === Monitor Summary ===
-Avg CPU:    58.02 %
-Max CPU:    86.80 %
-Avg Memory: 20.43 MB
-Max Memory: 20.43 MB
+Avg CPU:    57.90 %
+Max CPU:    86.90 %
+Avg Memory: 6.80 MB
+Max Memory: 6.80 MB
 ```
 
 ![tun-rs-sync-gso-flamegraph.svg](flamegraph/tun-rs-sync-gso-flamegraph.svg)
@@ -281,10 +286,58 @@ Connecting to host 10.0.2.1, port 5201
                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
 iperf Done.                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 === Monitor Summary ===
-Avg CPU:    121.64 %
-Max CPU:    181.00 %
-Avg Memory: 38.33 MB
-Max Memory: 38.33 MB
+Avg CPU:    124.49 %
+Max CPU:    185.00 %
+Avg Memory: 10.65 MB
+Max Memory: 10.65 MB
 ```
 
 ![tun-rs-sync-gso-concurrent-flamegraph.svg](flamegraph/tun-rs-sync-gso-concurrent-flamegraph.svg)
+
+### 12. Go TUN Implementation: Basic Read/Write (No Offload)
+
+https://github.com/tun-rs/go_tun_test
+
+```text
+Connecting to host 10.0.2.1, port 5201
+[  5] local 10.0.1.1 port 58348 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                                                                                                                            
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd                                                                                                                                                                                                                                                                                                                                                                                                           
+[  5]   0.00-10.00  sec  9.65 GBytes  8.29 Gbits/sec  541    505 KBytes                                                                                                                                                                                                                                                                                                                                                                                                    
+- - - - - - - - - - - - - - - - - - - - - - - - -                                                                                                                                                                                                                                                                                                                                                                                                                          
+[ ID] Interval           Transfer     Bitrate         Retr                                                                                                                                                                                                                                                                                                                                                                                                                 
+[  5]   0.00-10.00  sec  9.65 GBytes  8.29 Gbits/sec  541             sender                                                                                                                                                                                                                                                                                                                                                                                               
+[  5]   0.00-10.00  sec  9.65 GBytes  8.29 Gbits/sec                  receiver                                                                                                                                                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+iperf Done.                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+=== Monitor Summary ===
+Avg CPU:    84.95 %
+Max CPU:    127.00 %
+Avg Memory: 2.46 MB
+Max Memory: 2.46 MB
+```
+
+![go-tun-normal-flamegraph.svg](flamegraph/go-tun-normal-flamegraph.svg)
+
+### 13. Go TUN Implementation: With Offload (GSO/GRO Enabled)
+
+https://github.com/tun-rs/go_tun_test
+
+```text
+Connecting to host 10.0.2.1, port 5201
+[  5] local 10.0.1.1 port 57976 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                                                                                                                            
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd                                                                                                                                                                                                                                                                                                                                                                                                           
+[  5]   0.00-10.01  sec  33.6 GBytes  28.8 Gbits/sec    0   4.14 MBytes                                                                                                                                                                                                                                                                                                                                                                                                    
+- - - - - - - - - - - - - - - - - - - - - - - - -                                                                                                                                                                                                                                                                                                                                                                                                                          
+[ ID] Interval           Transfer     Bitrate         Retr                                                                                                                                                                                                                                                                                                                                                                                                                 
+[  5]   0.00-10.01  sec  33.6 GBytes  28.8 Gbits/sec    0             sender                                                                                                                                                                                                                                                                                                                                                                                               
+[  5]   0.00-10.01  sec  33.6 GBytes  28.8 Gbits/sec                  receiver                                                                                                                                                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+iperf Done.                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+=== Monitor Summary ===
+Avg CPU:    64.14 %
+Max CPU:    96.20 %
+Avg Memory: 4.15 MB
+Max Memory: 4.15 MB
+```
+
+![go-tun-offload-flamegraph.svg](flamegraph/go-tun-offload-flamegraph.svg)

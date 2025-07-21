@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 tokio = { version = "1.45.1", features = ["full"] }
-tun-rs = { version = "2.5.0", features = ["async","async_framed"] }
+tun-rs = { version = "2.5.1", features = ["async","async_framed"] }
 futures = "0.3"
 pnet_packet = "0.35.0"
 clap = { version = "4.5.40", features = ["derive"] }
