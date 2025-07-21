@@ -85,7 +85,10 @@ fn main() {
 }
 fn dev_to_channel(dev: Arc<SyncDevice>, sender: SyncSender<BytesMut>) {
     let mut original_buffer = vec![0; VIRTIO_NET_HDR_LEN + 65535];
-    let mut bufs = vec![BytesMut::zeroed(VIRTIO_NET_HDR_LEN + 1500); IDEAL_BATCH_SIZE];
+    let mut bufs = Vec::with_capacity(IDEAL_BATCH_SIZE);
+    for _ in 0..IDEAL_BATCH_SIZE {
+        bufs.push(BytesMut::zeroed(VIRTIO_NET_HDR_LEN + 65535));
+    }
     let mut sizes = vec![0; IDEAL_BATCH_SIZE];
     loop {
         let num = dev

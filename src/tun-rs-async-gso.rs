@@ -96,7 +96,10 @@ async fn run() {
 }
 async fn copy(device1: Arc<AsyncDevice>, device2: Arc<AsyncDevice>) {
     let mut original_buffer = vec![0; VIRTIO_NET_HDR_LEN + 65535];
-    let mut bufs = vec![BytesMut::zeroed(VIRTIO_NET_HDR_LEN + 65535); IDEAL_BATCH_SIZE];
+    let mut bufs = Vec::with_capacity(IDEAL_BATCH_SIZE);
+    for _ in 0..IDEAL_BATCH_SIZE {
+        bufs.push(BytesMut::zeroed(VIRTIO_NET_HDR_LEN + 65535));
+    }
     let mut sizes = vec![0; IDEAL_BATCH_SIZE];
     let mut gro_table = GROTable::default();
     loop {
