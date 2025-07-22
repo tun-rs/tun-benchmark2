@@ -33,16 +33,17 @@ handled using a Rust-based TUN forwarder, either in async or sync mode, with opt
 | 3   | AsyncFramed                                         | ❌       | ✅       | 12.0 | 3967 | 126.89  | 190.00  | 11.47   | 14.60   |
 | 4   | Async                                               | ✅       | ❌       | 35.7 | 0    | 64.89   | 97.70   | 7.44    | 7.44    |
 | 5   | Async                                               | ✅       | ✅       | 20.7 | 0    | 87.65   | 131.00  | 293.40  | 329.55  |
-| 6   | AsyncFramed                                         | ✅       | ✅       | 23.7 | 0    | 88.46   | 132.00  | 26.27   | 28.92   |
-| 7   | Sync                                                | ❌       | ❌       | 10.0 | 804  | 79.74   | 119.00  | 2.21    | 2.21    |
-| 8   | Sync                                                | ❌       | ✅       | 13.0 | 5585 | 136.90  | 205.00  | 3.97    | 4.23    |
-| 9   | Sync                                                | ✅       | ❌       | 36.4 | 0    | 57.90   | 86.90   | 6.80    | 6.80    |
-| 10  | Sync                                                | ✅       | ✅       | 33.7 | 0    | 95.27   | 143.00  | 111.30  | 140.10  |
-| 11* | Sync (Concurrent)                                   | ✅       | ❌       | 70.6 | 2748 | 124.49  | 185.00  | 10.65   | 10.65   |
-| 12  | [Go Basic](https://github.com/tun-rs/go_tun_test)   | ❌       | ❌       | 8.29 | 541  | 84.95   | 127.00  | 2.46    | 2.46    |
-| 13  | [Go Offload](https://github.com/tun-rs/go_tun_test) | ✅       | ❌       | 28.8 | 0    | 64.14   | 96.20   | 4.15    | 4.15    |
+| 6   | AsyncFramed + BytePool                              | ✅       | ✅       | 32.1 | 0    | 98.66   | 148.00  | 213.27  | 243.22  |
+| 7   | AsyncFramed                                         | ✅       | ✅       | 23.7 | 0    | 88.46   | 132.00  | 26.27   | 28.92   |
+| 8   | Sync                                                | ❌       | ❌       | 10.0 | 804  | 79.74   | 119.00  | 2.21    | 2.21    |
+| 9   | Sync                                                | ❌       | ✅       | 13.0 | 5585 | 136.90  | 205.00  | 3.97    | 4.23    |
+| 10  | Sync                                                | ✅       | ❌       | 36.4 | 0    | 57.90   | 86.90   | 6.80    | 6.80    |
+| 11  | Sync                                                | ✅       | ✅       | 33.7 | 0    | 95.27   | 143.00  | 111.30  | 140.10  |
+| 12* | Sync (Concurrent)                                   | ✅       | ❌       | 70.6 | 2748 | 124.49  | 185.00  | 10.65   | 10.65   |
+| 13  | [Go Basic](https://github.com/tun-rs/go_tun_test)   | ❌       | ❌       | 8.29 | 541  | 84.95   | 127.00  | 2.46    | 2.46    |
+| 14  | [Go Offload](https://github.com/tun-rs/go_tun_test) | ✅       | ❌       | 28.8 | 0    | 64.14   | 96.20   | 4.15    | 4.15    |
 
-\* Test 11 uses dual-threaded concurrent I/O with GSO enabled (no channel), yielding peak throughput.
+\* Test 12 uses dual-threaded concurrent I/O with GSO enabled (no channel), yielding peak throughput.
 
 - **Channel**: Channel buffering
 - **Gbps**: Bitrate
@@ -162,7 +163,29 @@ Max Memory: 329.55 MB
 
 ![tun-rs-async-gso-channel-flamegraph.svg](flamegraph/tun-rs-async-gso-channel-flamegraph.svg)
 
-### 6. TUN with Offload + DeviceFramed (Async)
+### 6. TUN with Offload + Channel Buffering + Byte Pool (Async)
+
+```text
+Connecting to host 10.0.2.1, port 5201
+[  5] local 10.0.1.1 port 57038 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                            
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd                                                                                                                                                                                                                                                                                                           
+[  5]   0.00-10.01  sec  37.4 GBytes  32.1 Gbits/sec    0   4.16 MBytes                                                                                                                                                                                                                                                                                                    
+- - - - - - - - - - - - - - - - - - - - - - - - -                                                                                                                                                                                                                                                                                                                          
+[ ID] Interval           Transfer     Bitrate         Retr                                                                                                                                                                                                                                                                                                                 
+[  5]   0.00-10.01  sec  37.4 GBytes  32.1 Gbits/sec    0             sender                                                                                                                                                                                                                                                                                               
+[  5]   0.00-10.01  sec  37.4 GBytes  32.1 Gbits/sec                  receiver                                                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                                                                           
+iperf Done.                                                                                                                                                                                                                                                                                                                                                                
+=== Monitor Summary ===
+Avg CPU:    98.66 %
+Max CPU:    148.00 %
+Avg Memory: 213.27 MB
+Max Memory: 243.22 MB
+```
+
+![tun-rs-async-gso-channel-pool-flamegraph.svg](flamegraph/tun-rs-async-gso-channel-pool-flamegraph.svg)
+
+### 7. TUN with Offload + DeviceFramed (Async)
 
 ```text
 Connecting to host 10.0.2.1, port 5201
@@ -184,7 +207,7 @@ Max Memory: 28.92 MB
 
 ![tun-rs-async-gso-framed-flamegraph.svg](flamegraph/tun-rs-async-gso-framed-flamegraph.svg)
 
-### 7. Basic TUN Read/Write (Sync)
+### 8. Basic TUN Read/Write (Sync)
 
 ```text
 Connecting to host 10.0.2.1, port 5201
@@ -206,7 +229,7 @@ Max Memory: 2.21 MB
 
 ![tun-rs-async-gso-framed-flamegraph.svg](flamegraph/tun-rs-async-gso-framed-flamegraph.svg)
 
-### 8. Basic TUN with Channel Buffering (Sync)
+### 9. Basic TUN with Channel Buffering (Sync)
 
 ```text
 Connecting to host 10.0.2.1, port 5201
@@ -228,7 +251,7 @@ Max Memory: 4.23 MB
 
 ![tun-rs-sync-normal-channel-flamegraph.svg](flamegraph/tun-rs-sync-normal-channel-flamegraph.svg)
 
-### 9. TUN with Offload Enabled (Sync)
+### 10. TUN with Offload Enabled (Sync)
 
 ```text
 Connecting to host 10.0.2.1, port 5201
@@ -250,7 +273,7 @@ Max Memory: 6.80 MB
 
 ![tun-rs-sync-gso-flamegraph.svg](flamegraph/tun-rs-sync-gso-flamegraph.svg)
 
-### 10. TUN with Offload + Channel Buffering (Sync)
+### 11. TUN with Offload + Channel Buffering (Sync)
 
 ```text
 Connecting to host 10.0.2.1, port 5201
@@ -272,7 +295,7 @@ Max Memory: 140.10 MB
 
 ![tun-rs-sync-gso-channel-flamegraph.svg](flamegraph/tun-rs-sync-gso-channel-flamegraph.svg)
 
-### 11. TUN with Offload + Dual-Threaded Concurrent I/O (Sync)
+### 12. TUN with Offload + Dual-Threaded Concurrent I/O (Sync)
 
 ```text
 Connecting to host 10.0.2.1, port 5201
@@ -294,7 +317,7 @@ Max Memory: 10.65 MB
 
 ![tun-rs-sync-gso-concurrent-flamegraph.svg](flamegraph/tun-rs-sync-gso-concurrent-flamegraph.svg)
 
-### 12. Go TUN Implementation: Basic Read/Write (No Offload)
+### 13. Go TUN Implementation: Basic Read/Write (No Offload)
 
 https://github.com/tun-rs/go_tun_test
 
@@ -318,7 +341,7 @@ Max Memory: 2.46 MB
 
 ![go-tun-normal-flamegraph.svg](flamegraph/go-tun-normal-flamegraph.svg)
 
-### 13. Go TUN Implementation: With Offload (GSO/GRO Enabled)
+### 14. Go TUN Implementation: With Offload (GSO/GRO Enabled)
 
 https://github.com/tun-rs/go_tun_test
 
