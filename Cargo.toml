@@ -28,6 +28,9 @@ path = "src/tun-rs-async-gso.rs"
 name = "tun-rs-async-gso-channel"
 path = "src/tun-rs-async-gso-channel.rs"
 [[bin]]
+name = "tun-rs-async-gso-channel-pool"
+path = "src/tun-rs-async-gso-channel-pool.rs"
+[[bin]]
 name = "tun-rs-async-gso-framed"
 path = "src/tun-rs-async-gso-framed.rs"
 
