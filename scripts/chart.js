@@ -6,20 +6,20 @@ const spec = {
       values: [
         { type: 'Rust', mode: 'Async', value: 8.84 },
         { type: 'Golang', mode: 'Async', value: 8.29 },
-        { type: 'Rust', mode: 'Async+Channel', value: 12.1},
-        { type: 'Golang', mode: 'Async+Channel', value: null },
-        { type: 'Rust', mode: 'AsyncFramed+Channel', value: 12.0},
-        { type: 'Golang', mode: 'AsyncFramed+Channel', value: null },
-        { type: 'Rust', mode: 'Async+Offload', value: 35.7},
-        { type: 'Golang', mode: 'Async+Offload', value: 28.8 },
+        { type: 'Rust', mode: 'Async+channel', value: 12.1},
+        { type: 'Golang', mode: 'Async+channel', value: null },
+        { type: 'Rust', mode: 'AsyncFramed+channel', value: 12.0},
+        { type: 'Golang', mode: 'AsyncFramed+channel', value: null },
+        { type: 'Rust', mode: 'Async+offload', value: 35.7},
+        { type: 'Golang', mode: 'Async+offload', value: 28.8 },
         { type: 'Rust', mode: 'Async+channel+offload', value: 20.7},
         { type: 'Golang', mode: 'Async+channel+offload', value: null },
         { type: 'Rust', mode: 'AsyncFramed+channel+offload', value: 23.7},
         { type: 'Rust', mode: 'Sync', value: 10.0},
-        { type: 'Rust', mode: 'Sync+Channel', value: 13.0},
-        { type: 'Rust', mode: 'Sync+Offload', value: 36.4},
-        { type: 'Rust', mode: 'Sync+channel+Offload', value: 33.7},
-        { type: 'Rust', mode: 'Sync+Offload+Cocurrent', value: 70.6},
+        { type: 'Rust', mode: 'Sync+channel', value: 13.0},
+        { type: 'Rust', mode: 'Sync+offload', value: 36.4},
+        { type: 'Rust', mode: 'Sync+channel+offload', value: 33.7},
+        { type: 'Rust', mode: 'Sync+offload+concurrent', value: 70.6},
       ]
     }
   ],
@@ -40,6 +40,12 @@ const spec = {
       }
     }
   ],
+  label: {
+    visible: true,
+    style:{
+      fontSize:10
+    }
+  },
   legends: {
     visible: true,
     orient: 'bottom',
