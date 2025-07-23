@@ -32,13 +32,13 @@ handled using a Rust-based TUN forwarder, either in async or sync mode, with opt
 | 2   | Async                                               | ❌       | ✅       | 12.1 | 3513 | 126.87  | 190.00  | 10.04   | 11.44   |
 | 3   | AsyncFramed                                         | ❌       | ✅       | 12.0 | 3967 | 126.89  | 190.00  | 11.47   | 14.60   |
 | 4   | Async                                               | ✅       | ❌       | 35.7 | 0    | 64.89   | 97.70   | 7.44    | 7.44    |
-| 5   | Async                                               | ✅       | ✅       | 20.7 | 0    | 87.65   | 131.00  | 293.40  | 329.55  |
-| 6   | Async + BytePool                                    | ✅       | ✅       | 32.1 | 0    | 98.66   | 148.00  | 213.27  | 243.22  |
+| 5   | Async                                               | ✅       | ✅       | 24.9 | 0    | 85.02   | 127.00  | 24.78   | 26.57   |
+| 6   | Async + BytePool                                    | ✅       | ✅       | 31.4 | 0    | 92.97   | 139.00  | 15.95   | 16.05   |
 | 7   | AsyncFramed                                         | ✅       | ✅       | 23.7 | 0    | 88.46   | 132.00  | 26.27   | 28.92   |
 | 8   | Sync                                                | ❌       | ❌       | 10.0 | 804  | 79.74   | 119.00  | 2.21    | 2.21    |
 | 9   | Sync                                                | ❌       | ✅       | 13.0 | 5585 | 136.90  | 205.00  | 3.97    | 4.23    |
 | 10  | Sync                                                | ✅       | ❌       | 36.4 | 0    | 57.90   | 86.90   | 6.80    | 6.80    |
-| 11  | Sync                                                | ✅       | ✅       | 33.7 | 0    | 95.27   | 143.00  | 111.30  | 140.10  |
+| 11  | Sync                                                | ✅       | ✅       | 29.5 | 0    | 90.38   | 135.00  | 14.87   | 15.00   |
 | 12* | Sync (Concurrent)                                   | ✅       | ❌       | 70.6 | 2748 | 124.49  | 185.00  | 10.65   | 10.65   |
 | 13  | [Go Basic](https://github.com/tun-rs/go_tun_test)   | ❌       | ❌       | 8.29 | 541  | 84.95   | 127.00  | 2.46    | 2.46    |
 | 14  | [Go Offload](https://github.com/tun-rs/go_tun_test) | ✅       | ❌       | 28.8 | 0    | 64.14   | 96.20   | 4.15    | 4.15    |
@@ -145,42 +145,42 @@ Max Memory: 7.44 MB
 
 ```text
 Connecting to host 10.0.2.1, port 5201
-[  5] local 10.0.1.1 port 41218 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                                                                                                                            
-[ ID] Interval           Transfer     Bitrate         Retr  Cwnd                                                                                                                                                                                                                                                                                                                                                                                                           
-[  5]   0.00-10.01  sec  24.1 GBytes  20.7 Gbits/sec    0   4.11 MBytes                                                                                                                                                                                                                                                                                                                                                                                                    
-- - - - - - - - - - - - - - - - - - - - - - - - -                                                                                                                                                                                                                                                                                                                                                                                                                          
-[ ID] Interval           Transfer     Bitrate         Retr                                                                                                                                                                                                                                                                                                                                                                                                                 
-[  5]   0.00-10.01  sec  24.1 GBytes  20.7 Gbits/sec    0             sender                                                                                                                                                                                                                                                                                                                                                                                               
-[  5]   0.00-10.01  sec  24.1 GBytes  20.7 Gbits/sec                  receiver                                                                                                                                                                                                                                                                                                                                                                                             
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-iperf Done.                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+[  5] local 10.0.1.1 port 35300 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                            
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd                                                                                                                                                                                                                                                                                                           
+[  5]   0.00-10.01  sec  29.0 GBytes  24.9 Gbits/sec    0   4.15 MBytes                                                                                                                                                                                                                                                                                                    
+- - - - - - - - - - - - - - - - - - - - - - - - -                                                                                                                                                                                                                                                                                                                          
+[ ID] Interval           Transfer     Bitrate         Retr                                                                                                                                                                                                                                                                                                                 
+[  5]   0.00-10.01  sec  29.0 GBytes  24.9 Gbits/sec    0             sender                                                                                                                                                                                                                                                                                               
+[  5]   0.00-10.01  sec  29.0 GBytes  24.9 Gbits/sec                  receiver                                                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                                                                           
+iperf Done.                                                                                                                                                                                                                                                                                                                                                                
 === Monitor Summary ===
-Avg CPU:    87.65 %
-Max CPU:    131.00 %
-Avg Memory: 293.40 MB
-Max Memory: 329.55 MB
+Avg CPU:    85.02 %
+Max CPU:    127.00 %
+Avg Memory: 24.78 MB
+Max Memory: 26.57 MB
 ```
 
 ![tun-rs-async-gso-channel-flamegraph.svg](flamegraph/tun-rs-async-gso-channel-flamegraph.svg)
 
-### 6. TUN with Offload + Channel Buffering + Byte Pool (Async)
+### 6. TUN with Offload + Channel Buffering + Bytes Pool (Async)
 
 ```text
 Connecting to host 10.0.2.1, port 5201
-[  5] local 10.0.1.1 port 57038 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                            
+[  5] local 10.0.1.1 port 37966 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                            
 [ ID] Interval           Transfer     Bitrate         Retr  Cwnd                                                                                                                                                                                                                                                                                                           
-[  5]   0.00-10.01  sec  37.4 GBytes  32.1 Gbits/sec    0   4.16 MBytes                                                                                                                                                                                                                                                                                                    
+[  5]   0.00-10.01  sec  36.6 GBytes  31.4 Gbits/sec    0   4.19 MBytes                                                                                                                                                                                                                                                                                                    
 - - - - - - - - - - - - - - - - - - - - - - - - -                                                                                                                                                                                                                                                                                                                          
 [ ID] Interval           Transfer     Bitrate         Retr                                                                                                                                                                                                                                                                                                                 
-[  5]   0.00-10.01  sec  37.4 GBytes  32.1 Gbits/sec    0             sender                                                                                                                                                                                                                                                                                               
-[  5]   0.00-10.01  sec  37.4 GBytes  32.1 Gbits/sec                  receiver                                                                                                                                                                                                                                                                                             
+[  5]   0.00-10.01  sec  36.6 GBytes  31.4 Gbits/sec    0             sender                                                                                                                                                                                                                                                                                               
+[  5]   0.00-10.01  sec  36.6 GBytes  31.4 Gbits/sec                  receiver                                                                                                                                                                                                                                                                                             
                                                                                                                                                                                                                                                                                                                                                                            
 iperf Done.                                                                                                                                                                                                                                                                                                                                                                
 === Monitor Summary ===
-Avg CPU:    98.66 %
-Max CPU:    148.00 %
-Avg Memory: 213.27 MB
-Max Memory: 243.22 MB
+Avg CPU:    92.97 %
+Max CPU:    139.00 %
+Avg Memory: 15.95 MB
+Max Memory: 16.05 MB
 ```
 
 ![tun-rs-async-gso-channel-pool-flamegraph.svg](flamegraph/tun-rs-async-gso-channel-pool-flamegraph.svg)
@@ -277,20 +277,20 @@ Max Memory: 6.80 MB
 
 ```text
 Connecting to host 10.0.2.1, port 5201
-[  5] local 10.0.1.1 port 38892 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                                                                                                                            
-[ ID] Interval           Transfer     Bitrate         Retr  Cwnd                                                                                                                                                                                                                                                                                                                                                                                                           
-[  5]   0.00-10.01  sec  39.2 GBytes  33.7 Gbits/sec    0   4.17 MBytes                                                                                                                                                                                                                                                                                                                                                                                                    
-- - - - - - - - - - - - - - - - - - - - - - - - -                                                                                                                                                                                                                                                                                                                                                                                                                          
-[ ID] Interval           Transfer     Bitrate         Retr                                                                                                                                                                                                                                                                                                                                                                                                                 
-[  5]   0.00-10.01  sec  39.2 GBytes  33.7 Gbits/sec    0             sender                                                                                                                                                                                                                                                                                                                                                                                               
-[  5]   0.00-10.01  sec  39.2 GBytes  33.7 Gbits/sec                  receiver                                                                                                                                                                                                                                                                                                                                                                                             
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-iperf Done.                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+[  5] local 10.0.1.1 port 38904 connected to 10.0.2.1 port 5201                                                                                                                                                                                                                                                                                                            
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd                                                                                                                                                                                                                                                                                                           
+[  5]   0.00-10.01  sec  34.4 GBytes  29.5 Gbits/sec    0   4.14 MBytes                                                                                                                                                                                                                                                                                                    
+- - - - - - - - - - - - - - - - - - - - - - - - -                                                                                                                                                                                                                                                                                                                          
+[ ID] Interval           Transfer     Bitrate         Retr                                                                                                                                                                                                                                                                                                                 
+[  5]   0.00-10.01  sec  34.4 GBytes  29.5 Gbits/sec    0             sender                                                                                                                                                                                                                                                                                               
+[  5]   0.00-10.01  sec  34.4 GBytes  29.5 Gbits/sec                  receiver                                                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                                                                           
+iperf Done.                                                                                                                                                                                                                                                                                                                                                                
 === Monitor Summary ===
-Avg CPU:    95.27 %
-Max CPU:    143.00 %
-Avg Memory: 111.30 MB
-Max Memory: 140.10 MB
+Avg CPU:    90.38 %
+Max CPU:    135.00 %
+Avg Memory: 14.87 MB
+Max Memory: 15.00 MB
 ```
 
 ![tun-rs-sync-gso-channel-flamegraph.svg](flamegraph/tun-rs-sync-gso-channel-flamegraph.svg)

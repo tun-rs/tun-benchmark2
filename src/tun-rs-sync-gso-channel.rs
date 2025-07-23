@@ -87,45 +87,48 @@ fn dev_to_channel(dev: Arc<SyncDevice>, sender: SyncSender<BytesMut>) {
     let mut original_buffer = vec![0; VIRTIO_NET_HDR_LEN + 65535];
     let mut bufs = Vec::with_capacity(IDEAL_BATCH_SIZE);
     for _ in 0..IDEAL_BATCH_SIZE {
-        bufs.push(BytesMut::zeroed(VIRTIO_NET_HDR_LEN + 65535));
+        bufs.push(BytesMut::zeroed(1500));
     }
     let mut sizes = vec![0; IDEAL_BATCH_SIZE];
     loop {
         let num = dev
-            .recv_multiple(
-                &mut original_buffer,
-                &mut bufs,
-                &mut sizes,
-                VIRTIO_NET_HDR_LEN,
-            )
+            .recv_multiple(&mut original_buffer, &mut bufs, &mut sizes, 0)
             .unwrap();
         if num == 0 {
             panic!("eof")
         }
         for i in 0..num {
-            // Reserve sufficient space in the buffer to avoid reallocations during send_multiple execution.
-            // This is critical for performance, especially under high throughput scenarios.
-            let mut buf = BytesMut::with_capacity(65536);
-            buf.extend_from_slice(&bufs[i][..VIRTIO_NET_HDR_LEN + sizes[i]]);
+            let buf = BytesMut::from(&bufs[i][..sizes[i]]);
             sender.send(buf).unwrap();
         }
     }
 }
 fn channel_to_dev(receiver: Receiver<BytesMut>, dev: Arc<SyncDevice>) {
     let mut send_bufs = Vec::with_capacity(IDEAL_BATCH_SIZE);
+    for _ in 0..IDEAL_BATCH_SIZE {
+        // Reserve sufficient space in the buffer to avoid reallocations during send_multiple execution.
+        // This is critical for performance, especially under high throughput scenarios.
+        send_bufs.push(BytesMut::with_capacity(VIRTIO_NET_HDR_LEN + 65536));
+    }
     let mut gro_table = GROTable::default();
 
     loop {
-        send_bufs.clear();
+        let mut n = 0;
         let bytes_mut = receiver.recv().unwrap();
-        send_bufs.push(bytes_mut);
+        send_bufs[n].clear();
+        send_bufs[n].resize(VIRTIO_NET_HDR_LEN, 0);
+        send_bufs[n].extend_from_slice(&bytes_mut);
+        n += 1;
         while let Ok(buf) = receiver.try_recv() {
-            send_bufs.push(buf);
-            if send_bufs.len() >= IDEAL_BATCH_SIZE {
+            send_bufs[n].clear();
+            send_bufs[n].resize(VIRTIO_NET_HDR_LEN, 0);
+            send_bufs[n].extend_from_slice(&buf);
+            n += 1;
+            if n >= IDEAL_BATCH_SIZE {
                 break;
             }
         }
-        dev.send_multiple(&mut gro_table, &mut send_bufs, VIRTIO_NET_HDR_LEN)
+        dev.send_multiple(&mut gro_table, &mut send_bufs[..n], VIRTIO_NET_HDR_LEN)
             .unwrap();
     }
 }
