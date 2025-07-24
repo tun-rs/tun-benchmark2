@@ -20,7 +20,7 @@ const spec = {
         { type: 'Rust', mode: 'Sync', value: 10.0},
         { type: 'Rust', mode: 'Sync+channel', value: 13.0},
         { type: 'Rust', mode: 'Sync+offload', value: 36.4},
-        { type: 'Rust', mode: 'Sync+channel+offload', value: 33.7},
+        { type: 'Rust', mode: 'Sync+channel+offload', value: 29.5},
         { type: 'Rust', mode: 'Sync+offload+concurrent', value: 70.6},
       ]
     }
