@@ -54,7 +54,7 @@ handled using a Rust-based TUN forwarder, either in async or sync mode, with opt
 - **CPU Avg/Max**: usage in %
 - **Mem Avg/Max**: usage in MB
 
-![throughput_chart.png](flamegraph/canvas.png)
+![throughput_chart.png](flamegraph/canvas.png)  
 
 ### 1. Basic TUN Read/Write (Async)
 
