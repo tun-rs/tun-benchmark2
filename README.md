@@ -1,5 +1,7 @@
 # TUN Benchmark Tool
 
+> **Note**: This benchmark suite has been updated to use [`tun-rs 2.8.1`](https://github.com/tun-rs/tun-rs). The benchmarks compare Rust implementations with Go implementations from [go_tun_test](https://github.com/tun-rs/go_tun_test).
+
 This is a benchmarking tool for measuring the performance of TUN interface implementations on Linux using different
 configurations and libraries.
 
@@ -10,7 +12,7 @@ configurations and libraries.
 - **Memory:** DDR5 32GB（2×16GB, 4800 MT/s）
 - **Benchmark Tool:** iperf3
 - **Baseline Performance (Loopback via TUN IP):** ~110 Gbps
-- **TUN Libraries:** [`tun-rs 2.5.1`](https://github.com/tun-rs/tun-rs)
+- **TUN Libraries:** [`tun-rs 2.8.1`](https://github.com/tun-rs/tun-rs)
 
 ## Test
 
