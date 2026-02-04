@@ -19,14 +19,31 @@ configurations and libraries.
 Each test uses `iperf3` to send traffic from `10.0.1.1` (via `tun11`) to `10.0.2.1` (via `tun22`). All interfaces are
 handled using a Rust-based TUN forwarder, either in async or sync mode, with optional channel buffering and offload.
 
+### Prerequisites
+
+Before running benchmarks, ensure you have:
+- `iperf3` installed (`sudo apt-get install iperf3`)
+- `perf` tools for profiling (`sudo apt-get install linux-tools-generic`)
+- Flamegraph tools (`cargo install flamegraph` or install `flamegraph.pl` and `stackcollapse-perf.pl`)
+- `sudo` privileges for network namespace management
+- Rust toolchain to build the binaries
+
+### Running Benchmarks
+
 ```shell
+ # Build all binaries
+ cargo build --release
+ 
  # Test all test cases
  ./scripts/bench.sh
+ 
  # Run the specified test case with parameters
  ./scripts/bench.sh "./target/release/tun-rs-async-gso-channel --thread 2"
 ```
 
 ## Benchmark Summary Table
+
+> **Note**: The benchmark results below are from the previous version (tun-rs 2.5.1). To update these results with tun-rs 2.8.1 data, run the benchmark script as described in the [Running Benchmarks](#running-benchmarks) section.
 
 | #   | Mode                                                        | Offload | Channel | Gbps | Retr | CPU Avg | CPU Max | Mem Avg | Mem Max |
 |-----|-------------------------------------------------------------|---------|---------|------|------|---------|---------|---------|---------|
