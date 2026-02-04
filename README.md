@@ -1,5 +1,9 @@
 # TUN Benchmark Tool
 
+> **Note**: This benchmark suite has been updated to use [`tun-rs 2.8.1`](https://github.com/tun-rs/tun-rs). The benchmarks compare Rust implementations with Go implementations from [go_tun_test](https://github.com/tun-rs/go_tun_test).
+> 
+> **Status**: ✅ Repository is ready for benchmark testing. All binaries built successfully with tun-rs 2.8.1. See [BENCHMARK_NOTES.md](BENCHMARK_NOTES.md) for testing details.
+
 This is a benchmarking tool for measuring the performance of TUN interface implementations on Linux using different
 configurations and libraries.
 
@@ -10,21 +14,38 @@ configurations and libraries.
 - **Memory:** DDR5 32GB（2×16GB, 4800 MT/s）
 - **Benchmark Tool:** iperf3
 - **Baseline Performance (Loopback via TUN IP):** ~110 Gbps
-- **TUN Libraries:** [`tun-rs 2.5.1`](https://github.com/tun-rs/tun-rs)
+- **TUN Libraries:** [`tun-rs 2.8.1`](https://github.com/tun-rs/tun-rs)
 
 ## Test
 
 Each test uses `iperf3` to send traffic from `10.0.1.1` (via `tun11`) to `10.0.2.1` (via `tun22`). All interfaces are
 handled using a Rust-based TUN forwarder, either in async or sync mode, with optional channel buffering and offload.
 
+### Prerequisites
+
+Before running benchmarks, ensure you have:
+- `iperf3` installed (`sudo apt-get install iperf3`)
+- `perf` tools for profiling (`sudo apt-get install linux-tools-generic`)
+- Flamegraph tools (`cargo install flamegraph` or install `flamegraph.pl` and `stackcollapse-perf.pl`)
+- `sudo` privileges for network namespace management
+- Rust toolchain to build the binaries
+
+### Running Benchmarks
+
 ```shell
+ # Build all binaries
+ cargo build --release
+ 
  # Test all test cases
  ./scripts/bench.sh
+ 
  # Run the specified test case with parameters
  ./scripts/bench.sh "./target/release/tun-rs-async-gso-channel --thread 2"
 ```
 
 ## Benchmark Summary Table
+
+> **Note**: The benchmark results below are from the previous version (tun-rs 2.5.1). To update these results with tun-rs 2.8.1 data, run the benchmark script as described in the [Running Benchmarks](#running-benchmarks) section.
 
 | #   | Mode                                                        | Offload | Channel | Gbps | Retr | CPU Avg | CPU Max | Mem Avg | Mem Max |
 |-----|-------------------------------------------------------------|---------|---------|------|------|---------|---------|---------|---------|
