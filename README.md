@@ -2,7 +2,7 @@
 
 > **Note**: This benchmark suite has been updated to use [`tun-rs 2.5.3`](https://github.com/tun-rs/tun-rs). The benchmarks compare Rust implementations with Go implementations from [go_tun_test](https://github.com/tun-rs/go_tun_test).
 > 
-> **Status**: ✅ Repository is ready for benchmark testing. All binaries built successfully with tun-rs 2.8.1. See [BENCHMARK_NOTES.md](BENCHMARK_NOTES.md) for testing details.
+> **Status**: ✅ Repository is ready for benchmark testing. All binaries built successfully with tun-rs 2.5.3. See [BENCHMARK_NOTES.md](BENCHMARK_NOTES.md) for testing details.
 
 This is a benchmarking tool for measuring the performance of TUN interface implementations on Linux using different
 configurations and libraries.
