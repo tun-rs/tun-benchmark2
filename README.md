@@ -14,7 +14,7 @@ configurations and libraries.
 - **Memory:** DDR5 32GB（2×16GB, 4800 MT/s）
 - **Benchmark Tool:** iperf3
 - **Baseline Performance (Loopback via TUN IP):** ~110 Gbps
-- **TUN Libraries:** [`tun-rs 2.8.1`](https://github.com/tun-rs/tun-rs)
+- **TUN Libraries:** [`tun-rs 2.5.3`](https://github.com/tun-rs/tun-rs)
 
 ## Test
 
